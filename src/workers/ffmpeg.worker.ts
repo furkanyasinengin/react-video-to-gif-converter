@@ -1,6 +1,6 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
-import type { WorkerRequest, WorkerResponse } from "../types/worker.types";
+import type { WorkerRequest } from "../types/worker.types";
 
 const ffmpeg = new FFmpeg();
 
