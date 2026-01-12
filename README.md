@@ -22,7 +22,7 @@ Unlike traditional converters that upload files to a server, this application pr
 
 The application is built with a modern stack focusing on performance and type safety:
 
-- **Frontend Framework:** React 18
+- **Frontend Framework:** React 19
 - **Language:** TypeScript
 - **Build Tool:** Vite
 - **Core Engine:** FFmpeg.wasm (0.12+)
