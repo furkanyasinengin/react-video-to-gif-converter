@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import FFmpegWorker from "../workers/ffmpeg.worker?worker";
 import type { WorkerResponse } from "../types/worker.types";
 
 export const useConverter = () => {
@@ -11,41 +12,44 @@ export const useConverter = () => {
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
-    if (!workerRef.current) {
-      workerRef.current = new Worker(
-        new URL("../workers/ffmpeg.worker.ts", import.meta.url),
-        { type: "module" }
-      );
-      workerRef.current.onmessage = (event) => {
-        const data = event.data as WorkerResponse;
-        switch (data.type) {
-          case "LOADED":
-            setReady(true);
-            break;
+    const worker = new FFmpegWorker();
+    workerRef.current = worker;
 
-          case "DONE":
-            setGif(data.data);
-            setConverting(false);
-            break;
+    worker.onmessage = (event) => {
+      const data = event.data as WorkerResponse;
 
-          case "PROGRESS":
-            setProgress(data.progress);
-            break;
-        }
-      };
-      workerRef.current.postMessage({ type: "LOAD" });
-    }
+      switch (data.type) {
+        case "LOADED":
+          setReady(true);
+          break;
+        case "DONE":
+          setGif(data.data);
+          setConverting(false);
+          break;
+        case "PROGRESS":
+          setProgress(data.progress);
+          break;
+        case "ERROR":
+          setError(data.message);
+          setConverting(false);
+          break;
+      }
+    };
 
+    worker.postMessage({
+      type: "LOAD",
+      baseUrl: window.location.origin,
+    });
     return () => {
       workerRef.current?.terminate();
     };
   }, []);
 
   const convertVideo = useCallback((file: File) => {
-    setConverting(true);
-    setError(null);
-    setGif(null);
     if (workerRef.current) {
+      setConverting(true);
+      setError(null);
+      setGif(null);
       workerRef.current.postMessage({ type: "CONVERT", file: file });
     }
   }, []);

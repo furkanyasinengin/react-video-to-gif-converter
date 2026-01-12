@@ -1,5 +1,5 @@
 export type WorkerRequest =
-  | { type: "LOAD" }
+  | { type: "LOAD"; baseUrl: string }
   | {
       type: "CONVERT";
       file: File;
