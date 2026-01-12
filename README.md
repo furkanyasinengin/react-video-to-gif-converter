@@ -1,73 +1,44 @@
-# React + TypeScript + Vite
+# Client-Side Video to GIF Converter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a high-performance web application that converts video files to GIF format entirely within the browser. It leverages WebAssembly (WASM) and Multithreading technologies to ensure data privacy and UI responsiveness.
 
-Currently, two official plugins are available:
+## Project Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Unlike traditional converters that upload files to a server, this application processes video data locally on the user's device. This architecture ensures zero server costs for processing and guarantees that user files never leave their machine.
 
-## React Compiler
+## Key Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Client-Side Processing:** All conversions happen locally using FFmpeg.wasm.
+- **Multithreading:** Utilizes Web Workers to offload heavy processing tasks from the main thread, keeping the UI responsive during conversion.
+- **Custom Configuration:** Users can adjust:
+  - Start and End time (Trimming)
+  - Frame Rate (FPS)
+  - Output Dimensions (Width/Scale)
+- **Drag & Drop Interface:** Intuitive file upload system with validation.
+- **Smart Metadata Extraction:** Automatically detects video duration and constraints input fields.
+- **Real-Time Progress:** Accurate progress tracking with visual feedback.
 
-## Expanding the ESLint configuration
+## Technical Architecture
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+The application is built with a modern stack focusing on performance and type safety:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Frontend Framework:** React 18
+- **Language:** TypeScript
+- **Build Tool:** Vite
+- **Core Engine:** FFmpeg.wasm (0.12+)
+- **Concurrency:** Web Workers API
+- **Styling:** Tailwind CSS
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Security & Headers
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+To enable `SharedArrayBuffer` required by FFmpeg.wasm, the application enforces strict security headers:
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- `Cross-Origin-Opener-Policy: same-origin`
+- `Cross-Origin-Embedder-Policy: require-corp`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Usage
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **Upload:** Drag and drop a video file (MP4, MOV, etc.) into the designated area.
+2. **Configure:** Adjust the start/end times, FPS, and width settings if needed. The input fields automatically validate against the video's duration.
+3. **Convert:** Click the "Convert To GIF" button. The processing happens in a background worker.
+4. **Download:** Once completed, preview the GIF and download it to your device.

@@ -36,9 +36,21 @@ self.onmessage = async (event: MessageEvent<WorkerRequest>) => {
 
     case "CONVERT": {
       try {
-        const { file } = event.data;
+        const { file, settings } = event.data;
         await ffmpeg.writeFile("input.mp4", await fetchFile(file));
-        await ffmpeg.exec(["-i", "input.mp4", "output.gif"]);
+        await ffmpeg.exec([
+          "-ss",
+          String(settings.start),
+          "-i",
+          "input.mp4",
+          "-to",
+          String(settings.end),
+          "-vf",
+          `fps=${settings.fps},scale=${settings.scale}:-1:flags=lanczos`,
+          "-c:v",
+          "gif",
+          "output.gif",
+        ]);
         const data = await ffmpeg.readFile("output.gif");
 
         const blob = new Blob([new Uint8Array(data as any)], {

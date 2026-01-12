@@ -7,6 +7,7 @@ export type WorkerRequest =
         start: number;
         end: number;
         fps: number;
+        scale: number;
       };
     };
 

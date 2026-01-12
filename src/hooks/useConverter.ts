@@ -24,11 +24,24 @@ export const useConverter = () => {
           break;
         case "DONE":
           setGif(data.data);
+          setProgress(1);
           setConverting(false);
           break;
-        case "PROGRESS":
-          setProgress(data.progress);
+        case "PROGRESS": {
+          const rawValue = data.progress;
+
+          if (rawValue > 1) return;
+
+          if (rawValue === 1) {
+            setProgress(0.99);
+            return;
+          }
+          if (rawValue >= 0) {
+            setProgress(rawValue);
+          }
+
           break;
+        }
         case "ERROR":
           setError(data.message);
           setConverting(false);
@@ -45,14 +58,25 @@ export const useConverter = () => {
     };
   }, []);
 
-  const convertVideo = useCallback((file: File) => {
-    if (workerRef.current) {
-      setConverting(true);
-      setError(null);
-      setGif(null);
-      workerRef.current.postMessage({ type: "CONVERT", file: file });
-    }
-  }, []);
+  const convertVideo = useCallback(
+    (
+      file: File,
+      settings: { fps: number; scale: number; start: number; end: number }
+    ) => {
+      if (workerRef.current) {
+        setConverting(true);
+        setError(null);
+        setGif(null);
+        setProgress(0);
+        workerRef.current.postMessage({
+          type: "CONVERT",
+          file: file,
+          settings,
+        });
+      }
+    },
+    []
+  );
 
   return { ready, converting, progress, gif, error, convertVideo };
 };
